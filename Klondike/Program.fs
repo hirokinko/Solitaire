@@ -1,4 +1,4 @@
-﻿module Klondike.Game =
+﻿module Klondike =
 
     type Suit =
         | Spade
@@ -60,21 +60,40 @@
                       Closed = this.Closed[.. this.Closed.Length - 1] }
                 )
 
-    let canPutCardToPile card prev =
-        match prev with
-        | None -> if card.Number = 13 then true else false
-        | Some (p: Card) ->
-            match p.Color with
+        member this.CanPutToOpened(card: Card) =
+            let tailOfOpened = this.Opened.Tail[0]
+
+            match tailOfOpened.Color with
             | Black ->
-                if card.Color = Red && card.Number = p.Number - 1 then
+                if card.Color = Red && card.Number = tailOfOpened.Number - 1 then
                     true
                 else
                     false
             | Red ->
-                if card.Color = Black && card.Number = p.Number - 1 then
+                if card.Color = Black && card.Number = tailOfOpened.Number - 1 then
                     true
                 else
                     false
+
+        member this.PutCards(cards: Card list) =
+            if cards.IsEmpty then
+                Error "No cards to put"
+            else
+                let headOfCards = cards.Head
+
+                match this.Opened.Length with
+                | 0 when this.Closed.IsEmpty && headOfCards.Number = 13 -> Ok({ Opened = cards; Closed = [] })
+                | 0 when this.Closed.IsEmpty && headOfCards.Number <> 13 ->
+                    Error "Cannot put the cards when head number is not 13"
+                | 0 when not this.Closed.IsEmpty -> Error "Please deal the tail of Closed cards"
+                | _ ->
+                    if this.CanPutToOpened headOfCards then
+                        Ok(
+                            { Opened = this.Opened @ cards
+                              Closed = this.Closed }
+                        )
+                    else
+                        Error "Cannot put the cards when the number of the head card or color of the head card is mismatched"
 
     type Tableau = { Piles: Pile list }
 
