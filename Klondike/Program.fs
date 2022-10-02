@@ -21,6 +21,10 @@
             | Heart -> Red
             | Diamond -> Red
 
+        member this.IsKing = if this.Number = 13 then true else false
+
+        member this.IsAce = if this.Number = 1 then true else false
+
     let toCard value =
         let suitOf m =
             match m with
@@ -31,6 +35,12 @@
 
         { Suit = suitOf (value % 4)
           Number = (value / 4) + 1 }
+
+    type PileStatus =
+        | Empty
+        | AllOpened
+        | AllClosed
+        | Others
 
     // FIXME: もっとスマートに表現できないか？
     type Pile =
@@ -49,16 +59,23 @@
                       Opened = this.Opened[.. this.Opened.Length - (count + 1)] }
                 )
 
-        member this.OpenTailOfClosed =
-            if not this.Opened.IsEmpty then
-                Error "Opened cards is not Empty"
-            else if this.Opened.IsEmpty && this.Closed.IsEmpty then
-                Error "This pile is Empty"
+        member this.Status =
+            if this.Opened.IsEmpty then
+                if this.Closed.IsEmpty then Empty else AllClosed
+            else if this.Closed.IsEmpty then
+                AllOpened
             else
+                Others
+
+        member this.OpenTailOfClosed =
+            match this.Status with
+            | Empty -> Error "This pile is Empty"
+            | AllClosed ->
                 Ok(
                     { Opened = this.Closed.Tail
                       Closed = this.Closed[.. this.Closed.Length - 1] }
                 )
+            | _ -> Error "Opened cards is not Empty"
 
         member this.CanPutToOpened(card: Card) =
             let tailOfOpened = this.Opened.Tail[0]
@@ -81,11 +98,10 @@
             else
                 let headOfCards = cards.Head
 
-                match this.Opened.Length with
-                | 0 when this.Closed.IsEmpty && headOfCards.Number = 13 -> Ok({ Opened = cards; Closed = [] })
-                | 0 when this.Closed.IsEmpty && headOfCards.Number <> 13 ->
-                    Error "Cannot put the cards when head number is not 13"
-                | 0 when not this.Closed.IsEmpty -> Error "Please deal the tail of Closed cards"
+                match this.Status with
+                | Empty when headOfCards.IsKing -> Ok({ Opened = cards; Closed = [] })
+                | Empty when not headOfCards.IsKing -> Error "Cannot put the cards when head number is not 13"
+                | AllClosed -> Error "Please deal the tail of Closed cards"
                 | _ ->
                     if this.CanPutToOpened headOfCards then
                         Ok(
@@ -93,7 +109,8 @@
                               Closed = this.Closed }
                         )
                     else
-                        Error "Cannot put the cards when the number of the head card or color of the head card is mismatched"
+                        Error
+                            "Cannot put the cards when the number of the head card or color of the head card is mismatched"
 
     type Tableau = { Piles: Pile list }
 
