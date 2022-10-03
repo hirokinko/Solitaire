@@ -1,4 +1,6 @@
-﻿module Klondike =
+﻿namespace Klondike
+
+module Klondike =
 
     type Suit =
         | Spade
@@ -40,7 +42,7 @@
             | _ -> Diamond // 3
 
         { Suit = suitOf (value % 4)
-          Number = (value / 4) + 1 }
+          Number = if value = 0 then 1 else (value / 4) + 1 }
 
     type PileStatus =
         | Empty
@@ -50,25 +52,13 @@
 
     // FIXME: もっとスマートに表現できないか？
     type Pile =
-        { Opened: Card list
-          Closed: Card list }
-
-        member this.PickFromOpened count =
-            if count > this.Opened.Length then
-                Error "Opened cards is Empty in this Pile"
-            else if count = this.Opened.Length then
-                Ok(this.Opened, { Closed = this.Closed; Opened = [] })
-            else
-                Ok(
-                    this.Opened[this.Opened.Length - count ..],
-                    { Closed = this.Closed
-                      Opened = this.Opened[.. this.Opened.Length - (count + 1)] }
-                )
+        { Opened: Card array
+          Closed: Card array }
 
         member this.Status =
-            if this.Opened.IsEmpty then
-                if this.Closed.IsEmpty then Empty else AllClosed
-            else if this.Closed.IsEmpty then
+            if Array.isEmpty this.Opened then
+                if Array.isEmpty this.Closed then Empty else AllClosed
+            else if Array.isEmpty this.Closed then
                 AllOpened
             else
                 Others
@@ -77,14 +67,28 @@
             match this.Status with
             | Empty -> Error "This pile is Empty"
             | AllClosed ->
+                let tailOfClosed = this.Closed[this.Closed.Length - 1]
+
                 Ok(
-                    { Opened = this.Closed.Tail
-                      Closed = this.Closed[.. this.Closed.Length - 1] }
+                    { Opened = [| tailOfClosed |]
+                      Closed = this.Closed[.. this.Closed.Length - 2] }
                 )
             | _ -> Error "Opened cards is not Empty"
 
+        member this.PickFromOpened count =
+            if count > this.Opened.Length then
+                Error "Opened cards is Empty in this Pile"
+            else if count = this.Opened.Length then
+                Ok(this.Opened, { Closed = this.Closed; Opened = [||] })
+            else
+                Ok(
+                    this.Opened[this.Opened.Length - count ..],
+                    { Closed = this.Closed
+                      Opened = this.Opened[.. this.Opened.Length - (count + 1)] }
+                )
+
         member this.CanPutToOpened(card: Card) =
-            let tailOfOpened = this.Opened.Tail[0]
+            let tailOfOpened = this.Opened[this.Opened.Length - 1]
 
             match tailOfOpened.Color with
             | Black ->
@@ -98,27 +102,27 @@
                 else
                     false
 
-        member this.PutCards(cards: Card list) =
-            if cards.IsEmpty then
+        member this.PutCards(cards: Card array) =
+            if Array.isEmpty cards then
                 Error "No cards to put"
             else
-                let headOfCards = cards.Head
+                let headOfCards = cards[0]
 
                 match this.Status with
-                | Empty when headOfCards.IsKing -> Ok({ Opened = cards; Closed = [] })
+                | Empty when headOfCards.IsKing -> Ok({ Opened = cards; Closed = [||] })
                 | Empty when not headOfCards.IsKing -> Error "Cannot put the cards when head number is not 13"
                 | AllClosed -> Error "Please deal the tail of Closed cards"
                 | _ ->
                     if this.CanPutToOpened headOfCards then
                         Ok(
-                            { Opened = this.Opened @ cards
+                            { Opened = Array.append this.Opened cards
                               Closed = this.Closed }
                         )
                     else
                         Error
                             "Cannot put the cards when the number of the head card or color of the head card is mismatched"
 
-    type Tableau = { Piles: Pile list }
+    type Tableau = { Piles: Pile array }
 
     type Foundations =
         { InnerMap: Map<Suit, Card list> }
@@ -132,8 +136,8 @@
                 Error "Cannot put the card on this Suit"
 
     type State =
-        { Picked: Card list
-          Stock: Card list
-          Waste: Card list
+        { Picked: Card array
+          Stock: Card array
+          Waste: Card array
           Tableau: Tableau
           Foundations: Foundations }
