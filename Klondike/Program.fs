@@ -25,6 +25,12 @@
 
         member this.IsAce = if this.Number = 1 then true else false
 
+        member this.IsNextTo card =
+            if this.Number = card.Number + 1 then true else false
+
+        member this.IsBefore card =
+            if this.Number = card.Number - 1 then true else false
+
     let toCard value =
         let suitOf m =
             match m with
@@ -82,12 +88,12 @@
 
             match tailOfOpened.Color with
             | Black ->
-                if card.Color = Red && card.Number = tailOfOpened.Number - 1 then
+                if card.Color = Red && card.IsBefore tailOfOpened then
                     true
                 else
                     false
             | Red ->
-                if card.Color = Black && card.Number = tailOfOpened.Number - 1 then
+                if card.Color = Black && card.IsBefore tailOfOpened then
                     true
                 else
                     false
@@ -114,21 +120,16 @@
 
     type Tableau = { Piles: Pile list }
 
-    // FIXME: 列ごとにスートを固定できるように型で表現したい
     type Foundations =
-        { Spades: Card list
-          Clubs: Card list
-          Hearts: Card list
-          Diamonds: Card list }
+        { InnerMap: Map<Suit, Card list> }
 
-    let canPutCardToFoundation card prev =
-        match prev with
-        | None -> if card.Number = 1 then true else false
-        | Some p ->
-            if card.Suit = p.Suit && card.Number = p.Number + 1 then
-                true
+        member this.PutCard(card: Card) =
+            let l = this.InnerMap[card.Suit]
+
+            if (l.IsEmpty && card.IsAce) || (not l.IsEmpty && card.IsNextTo l.Tail[0]) then
+                Ok { InnerMap = this.InnerMap.Add(card.Suit, (l @ [ card ])) }
             else
-                false
+                Error "Cannot put the card on this Suit"
 
     type State =
         { Picked: Card list
