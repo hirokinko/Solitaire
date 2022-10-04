@@ -67,7 +67,7 @@ module Klondike =
             match this.Status with
             | Empty -> Error "This pile is Empty"
             | AllClosed ->
-                let tailOfClosed = this.Closed[this.Closed.Length - 1]
+                let tailOfClosed = Array.last this.Closed
 
                 Ok(
                     { Opened = [| tailOfClosed |]
@@ -88,7 +88,7 @@ module Klondike =
                 )
 
         member this.CanPutToOpened(card: Card) =
-            let tailOfOpened = this.Opened[this.Opened.Length - 1]
+            let tailOfOpened = Array.last this.Opened
 
             match tailOfOpened.Color with
             | Black ->
@@ -125,13 +125,16 @@ module Klondike =
     type Tableau = { Piles: Pile array }
 
     type Foundations =
-        { InnerMap: Map<Suit, Card list> }
+        { InnerMap: Map<Suit, Card array> }
 
         member this.PutCard(card: Card) =
             let l = this.InnerMap[card.Suit]
 
-            if (l.IsEmpty && card.IsAce) || (not l.IsEmpty && card.IsNextTo l.Tail[0]) then
-                Ok { InnerMap = this.InnerMap.Add(card.Suit, (l @ [ card ])) }
+            if
+                (Array.isEmpty l && card.IsAce)
+                || (not (Array.isEmpty l) && Array.last l |> card.IsNextTo)
+            then
+                Ok { InnerMap = this.InnerMap.Add(card.Suit, (Array.append l [| card |])) }
             else
                 Error "Cannot put the card on this Suit"
 

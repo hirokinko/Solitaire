@@ -407,3 +407,61 @@ type PileTestClass() =
                 m
             )
         | _ -> Assert.Fail("Invalid result")
+
+
+[<TestFixture>]
+type FoundationPutCardTest() =
+
+    [<Test>]
+    member this.TestArrayIsEmptyAndCardIsAce() =
+        let foundations =
+            { InnerMap = Map [ (Spade, [||]); (Club, [||]); (Heart, [||]); (Diamond, [||]) ] }
+
+        let card = { Suit = Spade; Number = 1 }
+
+        match foundations.PutCard card with
+        | Ok f -> Assert.AreEqual([| { Suit = Spade; Number = 1 } |], f.InnerMap[Spade])
+        | _ -> Assert.Fail("Invalid result")
+
+    [<Test>]
+    member this.TestArrayIsEmptyAndCardIsNotAce() =
+        let foundations =
+            { InnerMap = Map [ (Spade, [||]); (Club, [||]); (Heart, [||]); (Diamond, [||]) ] }
+
+        let card = { Suit = Spade; Number = 2 }
+
+        match foundations.PutCard card with
+        | Error m -> Assert.AreEqual("Cannot put the card on this Suit", m)
+        | _ -> Assert.Fail("Invalid result")
+
+    [<Test>]
+    member this.TestOneCardInArrayAndCardIsNext() =
+        let foundations =
+            { InnerMap =
+                Map
+                    [ (Spade, [| { Suit = Spade; Number = 1 } |])
+                      (Club, [||])
+                      (Heart, [||])
+                      (Diamond, [||]) ] }
+
+        let card = { Suit = Spade; Number = 2 }
+
+        match foundations.PutCard card with
+        | Ok f -> Assert.AreEqual([| { Suit = Spade; Number = 1 }; { Suit = Spade; Number = 2 } |], f.InnerMap[Spade])
+        | _ -> Assert.Fail("Invalid result")
+
+    [<Test>]
+    member this.TestOneCardInArrayAndCardIsNotNext() =
+        let foundations =
+            { InnerMap =
+                Map
+                    [ (Spade, [| { Suit = Spade; Number = 1 } |])
+                      (Club, [||])
+                      (Heart, [||])
+                      (Diamond, [||]) ] }
+
+        let card = { Suit = Spade; Number = 3 }
+
+        match foundations.PutCard card with
+        | Error m -> Assert.AreEqual("Cannot put the card on this Suit", m)
+        | _ -> Assert.Fail("Invalid result")
