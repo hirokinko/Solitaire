@@ -82,11 +82,15 @@ module Klondike =
             if count > this.Opened.Length then
                 Error "Opened cards is Empty in this Pile"
             else if count = this.Opened.Length then
-                Ok(this.Opened, { Closed = this.Closed; Opened = [||] })
+                Ok(
+                    this.Opened,
+                    { Closed = Array.copy this.Closed
+                      Opened = [||] }
+                )
             else
                 Ok(
                     this.Opened[this.Opened.Length - count ..],
-                    { Closed = this.Closed
+                    { Closed = Array.copy this.Closed
                       Opened = this.Opened[.. this.Opened.Length - (count + 1)] }
                 )
 
@@ -112,20 +116,28 @@ module Klondike =
                 let headOfCards = cards[0]
 
                 match this.Status with
-                | Empty when headOfCards.IsKing -> Ok({ Opened = cards; Closed = [||] })
+                | Empty when headOfCards.IsKing ->
+                    Ok(
+                        { Opened = Array.copy cards
+                          Closed = [||] }
+                    )
                 | Empty when not headOfCards.IsKing -> Error "Cannot put the cards when head number is not 13"
                 | AllClosed -> Error "Please deal the tail of Closed cards"
                 | _ ->
                     if this.CanPutToOpened headOfCards then
                         Ok(
                             { Opened = Array.append this.Opened cards
-                              Closed = this.Closed }
+                              Closed = Array.copy this.Closed }
                         )
                     else
                         Error
                             "Cannot put the cards when the number of the head card or color of the head card is mismatched"
 
-    type Tableau = { Piles: Pile array }
+    type Tableau =
+        { Piles: Pile array }
+
+        static member New = [| for i in 1..7 -> { Opened = [||]; Closed = [||] } |]
+
 
     type Foundations =
         { InnerMap: Map<Suit, Card array> }
@@ -140,6 +152,9 @@ module Klondike =
                 Ok { InnerMap = this.InnerMap.Add(card.Suit, (Array.append l [| card |])) }
             else
                 Error "Cannot put the card on this Suit"
+
+        static member New =
+            { InnerMap = Map [ (Spade, [||]); (Heart, [||]); (Club, [||]); (Diamond, [||]) ] }
 
     type State =
         { Picked: Card array
