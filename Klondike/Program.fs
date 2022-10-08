@@ -136,7 +136,29 @@ module Klondike =
     type Tableau =
         { Piles: Pile array }
 
-        static member New = [| for i in 1..7 -> { Opened = [||]; Closed = [||] } |]
+        // TODO: 後で繰り返しに書き換える
+        static member Init(cards: Card array) =
+            if cards.Length < 28 then
+                Error "Not enough cards"
+            else
+                Ok(
+                    { Piles =
+                        [| { Opened = [| cards[0] |]
+                             Closed = [||] }
+                           { Opened = [| cards[2] |]
+                             Closed = [| cards[1] |] }
+                           { Opened = [| cards[5] |]
+                             Closed = cards[3..4] }
+                           { Opened = [| cards[9] |]
+                             Closed = cards[6..8] }
+                           { Opened = [| cards[14] |]
+                             Closed = cards[10..13] }
+                           { Opened = [| cards[20] |]
+                             Closed = cards[15..19] }
+                           { Opened = [| cards[27] |]
+                             Closed = cards[21..26] } |] },
+                    cards[28..]
+                )
 
 
     type Foundations =
@@ -153,12 +175,26 @@ module Klondike =
             else
                 Error "Cannot put the card on this Suit"
 
-        static member New =
+        static member Init =
             { InnerMap = Map [ (Spade, [||]); (Heart, [||]); (Club, [||]); (Diamond, [||]) ] }
 
+    // TODO: 前の状態と遷移可能な次の状態を載せる？
     type State =
         { Picked: Card array
           Stock: Card array
           Waste: Card array
           Tableau: Tableau
           Foundations: Foundations }
+
+        static member Init cards =
+            match Tableau.Init cards with
+            | Error m -> Error m
+            | Ok result ->
+                let tableau, stock = result
+
+                Ok
+                    { Picked = [||]
+                      Stock = stock
+                      Waste = [||]
+                      Tableau = tableau
+                      Foundations = Foundations.Init }
