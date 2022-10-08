@@ -4,7 +4,7 @@ open NUnit.Framework
 open Klondike.Klondike
 
 [<TestFixture>]
-type InitTests() =
+type TableauInitTests() =
 
     [<Test>]
     member this.TestOk() =

@@ -58,6 +58,14 @@ module Klondike =
         { Opened: Card array
           Closed: Card array }
 
+        static member Init(cards: Card array) =
+            if Array.isEmpty cards then
+                Error "Cards are empty"
+            else
+                Ok
+                    { Opened = [| Array.last cards |]
+                      Closed = cards[.. cards.Length - 2] }
+
         member this.Status =
             if Array.isEmpty this.Opened then
                 if Array.isEmpty this.Closed then Empty else AllClosed
@@ -136,29 +144,22 @@ module Klondike =
     type Tableau =
         { Piles: Pile array }
 
-        // TODO: 後で繰り返しに書き換える
         static member Init(cards: Card array) =
             if cards.Length < 28 then
                 Error "Not enough cards"
             else
-                Ok(
-                    { Piles =
-                        [| { Opened = [| cards[0] |]
-                             Closed = [||] }
-                           { Opened = [| cards[2] |]
-                             Closed = [| cards[1] |] }
-                           { Opened = [| cards[5] |]
-                             Closed = cards[3..4] }
-                           { Opened = [| cards[9] |]
-                             Closed = cards[6..8] }
-                           { Opened = [| cards[14] |]
-                             Closed = cards[10..13] }
-                           { Opened = [| cards[20] |]
-                             Closed = cards[15..19] }
-                           { Opened = [| cards[27] |]
-                             Closed = cards[21..26] } |] },
-                    cards[28..]
-                )
+                let rec generateTableauAndStocks time (stocks: Card array) piles =
+                    if time = 7 then
+                        Ok({ Piles = piles }, stocks)
+                    else
+                        let nextTime = time + 1
+                        let newPile = Pile.Init stocks[..time]
+
+                        match newPile with
+                        | Ok p -> generateTableauAndStocks nextTime stocks[nextTime..] (Array.append piles [| p |])
+                        | Error m -> Error m
+
+                generateTableauAndStocks 0 cards [||]
 
 
     type Foundations =

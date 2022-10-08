@@ -4,6 +4,48 @@ open NUnit.Framework
 open Klondike.Klondike
 
 [<TestFixture>]
+type PileInitTests() =
+
+    [<Test>]
+    member this.EmptyCase() =
+        match Pile.Init [||] with
+        | Ok _ -> Assert.Fail("Invalid result")
+        | Error m -> Assert.AreEqual("Cards are empty", m)
+
+    [<Test>]
+    member this.OneCardCase() =
+        match Pile.Init [| Card(Spade, 1) |] with
+        | Ok p ->
+            Assert.AreEqual(
+                { Opened = [| Card(Spade, 1) |]
+                  Closed = [||] },
+                p
+            )
+        | _ -> Assert.Fail("Invalid result")
+
+    [<Test>]
+    member this.TwoCardsCase() =
+        match Pile.Init [| Card(Spade, 1); Card(Spade, 2) |] with
+        | Ok p ->
+            Assert.AreEqual(
+                { Opened = [| Card(Spade, 2) |]
+                  Closed = [| Card(Spade, 1) |] },
+                p
+            )
+        | _ -> Assert.Fail("Invalid result")
+
+    [<Test>]
+    member this.ThreeOrMoreCards() =
+        match Pile.Init [| Card(Spade, 1); Card(Spade, 2); Card(Spade, 3) |] with
+        | Ok p ->
+            Assert.AreEqual(
+                { Opened = [| Card(Spade, 3) |]
+                  Closed = [| Card(Spade, 1); Card(Spade, 2) |] },
+                p
+            )
+        | _ -> Assert.Fail("Invalid result")
+
+[<TestFixture>]
 type PileStatusTests() =
 
     [<Test>]
