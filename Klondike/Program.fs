@@ -13,25 +13,29 @@ module Klondike =
         | Red
 
     type Card =
-        { Suit: Suit
-          Number: int }
+        struct
+            val Suit: Suit
+            val Number: int
+            new(suit: Suit, number: int) = { Suit = suit; Number = number }
 
-        member this.Color =
-            match this.Suit with
-            | Spade -> Black
-            | Club -> Black
-            | Heart -> Red
-            | Diamond -> Red
+            member this.Color =
+                match this.Suit with
+                | Spade -> Black
+                | Club -> Black
+                | Heart -> Red
+                | Diamond -> Red
 
-        member this.IsKing = if this.Number = 13 then true else false
+            member this.IsKing = if this.Number = 13 then true else false
 
-        member this.IsAce = if this.Number = 1 then true else false
+            member this.IsAce = if this.Number = 1 then true else false
 
-        member this.IsNextTo card =
-            if this.Number = card.Number + 1 then true else false
+            member this.IsNextTo(card: Card) =
+                if this.Number = card.Number + 1 then true else false
 
-        member this.IsBefore card =
-            if this.Number = card.Number - 1 then true else false
+            member this.IsBefore(card: Card) =
+                if this.Number = card.Number - 1 then true else false
+        end
+
 
     let toCard value =
         let suitOf m =
@@ -41,8 +45,7 @@ module Klondike =
             | 2 -> Heart
             | _ -> Diamond // 3
 
-        { Suit = suitOf (value % 4)
-          Number = if value = 0 then 1 else (value / 4) + 1 }
+        Card(suitOf (value % 4), (if value = 0 then 1 else (value / 4) + 1))
 
     type PileStatus =
         | Empty
