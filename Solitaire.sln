@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Solitaire", "Solitaire\Solitaire.fsproj", "{C546D180-7F82-4358-804F-209BC63B71B0}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Solitaire.Tests", "Solitaire.Tests\Solitaire.Tests.fsproj", "{16EDFBAF-135B-4233-95A0-31D60EA61E0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -10,5 +14,15 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C546D180-7F82-4358-804F-209BC63B71B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C546D180-7F82-4358-804F-209BC63B71B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C546D180-7F82-4358-804F-209BC63B71B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C546D180-7F82-4358-804F-209BC63B71B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16EDFBAF-135B-4233-95A0-31D60EA61E0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16EDFBAF-135B-4233-95A0-31D60EA61E0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16EDFBAF-135B-4233-95A0-31D60EA61E0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16EDFBAF-135B-4233-95A0-31D60EA61E0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
