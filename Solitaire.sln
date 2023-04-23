@@ -7,6 +7,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Solitaire", "Solitaire\Soli
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Solitaire.Tests", "Solitaire.Tests\Solitaire.Tests.fsproj", "{16EDFBAF-135B-4233-95A0-31D60EA61E0F}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Klondike", "Klondike\Klondike.fsproj", "{C6E3574B-96EE-4388-B0FE-51B43919826C}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Klondike.Tests", "Klondike.Tests\Klondike.Tests.fsproj", "{6532AC68-390D-4671-91AC-CEA58422C47B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{16EDFBAF-135B-4233-95A0-31D60EA61E0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16EDFBAF-135B-4233-95A0-31D60EA61E0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16EDFBAF-135B-4233-95A0-31D60EA61E0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6E3574B-96EE-4388-B0FE-51B43919826C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6E3574B-96EE-4388-B0FE-51B43919826C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6E3574B-96EE-4388-B0FE-51B43919826C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6E3574B-96EE-4388-B0FE-51B43919826C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6532AC68-390D-4671-91AC-CEA58422C47B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6532AC68-390D-4671-91AC-CEA58422C47B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6532AC68-390D-4671-91AC-CEA58422C47B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6532AC68-390D-4671-91AC-CEA58422C47B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
